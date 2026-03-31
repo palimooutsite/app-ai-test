@@ -27,10 +27,10 @@ export class BankTransaction {
   @Column()
   description!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   reference!: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   accountNumber!: string | null;
 
   @CreateDateColumn()
