@@ -1,4 +1,4 @@
-# SaaS Accounting System (Backend-first)
+# SaaS Accounting System (Backend + Frontend Scaffold)
 
 Production-oriented backend scaffold for a multi-tenant SME accounting platform using **NestJS + Prisma + PostgreSQL**.
 
@@ -25,6 +25,19 @@ backend/
       reports/
       integrations/
       health/
+frontend/
+  app/
+    login/
+    dashboard/
+    accounts/
+    journal-entries/
+    reports/
+      balance-sheet/
+      income-statement/
+      cash-flow/
+    integrations/
+    settings/users-roles/
+  components/
 Dockerfile
 docker-compose.yml
 ```
@@ -56,8 +69,8 @@ Cross-cutting:
 
 ## 4) Frontend pages (Next.js App Router)
 
-Backend-first delivery complete.
-Suggested frontend routes for next phase:
+Frontend scaffold added with Next.js App Router.
+Implemented routes:
 - `/login`
 - `/dashboard`
 - `/accounts`
@@ -114,3 +127,12 @@ Health:
 - Add idempotency keys for integrations.
 - Add audit logs and immutable journal posting workflow.
 - Add reconciliation workflows and scheduled sync jobs.
+
+
+## 6b) Frontend quick start
+
+1. Install frontend dependencies:
+   - `cd frontend && npm install`
+2. Run frontend dev server:
+   - `npm run dev`
+3. Open `http://localhost:3000` (redirects to `/dashboard`).
