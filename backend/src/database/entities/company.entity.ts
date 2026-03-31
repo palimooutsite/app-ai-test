@@ -13,7 +13,7 @@ export class Company {
   @Column()
   name!: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   taxId!: string | null;
 
   @Column({ default: 'IDR' })
