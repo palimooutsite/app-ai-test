@@ -1,12 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from '../../database/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import { CurrentUser } from '../../common/interfaces/current-user.interface';
+import { Account, JournalEntry, JournalLine } from '../../database/entities';
 import { CreateJournalEntryDto } from './dto/create-journal-entry.dto';
 
 @Injectable()
 export class JournalService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(Account)
+    private readonly accountsRepository: Repository<Account>,
+    @InjectRepository(JournalEntry)
+    private readonly journalEntriesRepository: Repository<JournalEntry>,
+    @InjectRepository(JournalLine)
+    private readonly journalLinesRepository: Repository<JournalLine>
+  ) {}
 
   async create(currentUser: CurrentUser, dto: CreateJournalEntryDto) {
     const debitTotal = dto.lines.reduce((sum, line) => sum + line.debit, 0);
@@ -17,9 +25,9 @@ export class JournalService {
     }
 
     const accountIds = dto.lines.map((line) => line.accountId);
-    const validCount = await this.prisma.account.count({
+    const validCount = await this.accountsRepository.count({
       where: {
-        id: { in: accountIds },
+        id: In(accountIds),
         companyId: currentUser.companyId,
         isActive: true
       }
@@ -29,34 +37,52 @@ export class JournalService {
       throw new BadRequestException('One or more accounts are invalid for this tenant');
     }
 
-    return this.prisma.journalEntry.create({
-      data: {
+    const savedEntry = await this.journalEntriesRepository.save(
+      this.journalEntriesRepository.create({
         companyId: currentUser.companyId,
         referenceNo: dto.referenceNo,
         description: dto.description,
         entryDate: new Date(dto.entryDate),
-        createdById: currentUser.sub,
-        lines: {
-          create: dto.lines.map((line) => ({
-            accountId: line.accountId,
-            debit: new Prisma.Decimal(line.debit),
-            credit: new Prisma.Decimal(line.credit),
-            memo: line.memo
-          }))
-        }
-      },
-      include: { lines: true }
+        createdById: currentUser.sub
+      })
+    );
+
+    await this.journalLinesRepository.save(
+      dto.lines.map((line) =>
+        this.journalLinesRepository.create({
+          journalEntryId: savedEntry.id,
+          accountId: line.accountId,
+          debit: line.debit.toFixed(2),
+          credit: line.credit.toFixed(2),
+          memo: line.memo ?? null
+        })
+      )
+    );
+
+    return this.journalEntriesRepository.findOneOrFail({
+      where: { id: savedEntry.id },
+      relations: { lines: true }
     });
   }
 
   async list(currentUser: CurrentUser) {
-    return this.prisma.journalEntry.findMany({
+    return this.journalEntriesRepository.find({
       where: { companyId: currentUser.companyId },
-      include: {
-        lines: { include: { account: true } },
-        createdBy: { select: { id: true, fullName: true, email: true } }
+      relations: {
+        lines: { account: true },
+        createdBy: true
       },
-      orderBy: [{ entryDate: 'desc' }, { createdAt: 'desc' }]
+      select: {
+        createdBy: {
+          id: true,
+          fullName: true,
+          email: true
+        }
+      },
+      order: {
+        entryDate: 'DESC',
+        createdAt: 'DESC'
+      }
     });
   }
 }

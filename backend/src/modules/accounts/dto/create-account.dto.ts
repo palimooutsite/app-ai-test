@@ -1,4 +1,4 @@
-import { AccountType } from '@prisma/client';
+import { AccountType } from '../../../database/enums';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateAccountDto {

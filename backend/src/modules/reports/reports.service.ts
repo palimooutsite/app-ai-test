@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { AccountType } from '@prisma/client';
-import { PrismaService } from '../../database/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Between, Repository } from 'typeorm';
 import { CurrentUser } from '../../common/interfaces/current-user.interface';
+import { AccountType } from '../../database/enums';
+import { JournalLine } from '../../database/entities';
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(JournalLine)
+    private readonly journalLinesRepository: Repository<JournalLine>
+  ) {}
 
   async incomeStatement(currentUser: CurrentUser, from: Date, to: Date) {
     const lines = await this.fetchLines(currentUser.companyId, from, to);
@@ -50,14 +55,17 @@ export class ReportsService {
   }
 
   private async fetchLines(companyId: string, from: Date, to: Date) {
-    return this.prisma.journalLine.findMany({
+    return this.journalLinesRepository.find({
       where: {
         journalEntry: {
           companyId,
-          entryDate: { gte: from, lte: to }
+          entryDate: Between(from, to)
         }
       },
-      include: { account: true }
+      relations: {
+        account: true,
+        journalEntry: true
+      }
     });
   }
 
