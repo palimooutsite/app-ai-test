@@ -25,7 +25,6 @@ const navSections = [
     items: [
       { href: '/integrations', label: 'Integrations' },
       { href: '/settings/users-roles', label: 'Users & Roles' },
-      { href: '/login', label: 'Login' },
     ],
   },
 ];
