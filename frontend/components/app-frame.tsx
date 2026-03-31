@@ -6,9 +6,9 @@ import { Sidebar } from './sidebar';
 
 export function AppFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isLoginPage = pathname === '/login';
+  const isAuthPage = pathname === '/login' || pathname === '/register';
 
-  if (isLoginPage) {
+  if (isAuthPage) {
     return <main className="login-main">{children}</main>;
   }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -63,6 +64,10 @@ export default function LoginPage() {
             {isLoading ? 'Authenticating...' : 'Login to main workspace'}
           </button>
         </form>
+
+        <p className="auth-switch-link">
+          Belum punya akun? <Link href="/register">Daftar sekarang</Link>
+        </p>
       </div>
     </section>
   );
