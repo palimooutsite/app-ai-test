@@ -1,12 +1,23 @@
 import { PageShell } from '../../components/page-shell';
 
+const kpiData = [
+  { label: 'Revenue (MTD)', value: '$128,450', change: '+8.2%' },
+  { label: 'Expenses (MTD)', value: '$74,210', change: '-2.1%' },
+  { label: 'Cash Balance', value: '$342,900', change: '+3.6%' },
+  { label: 'Open Invoices', value: '$46,500', change: '12 overdue' },
+];
+
 export default function DashboardPage() {
   return (
-    <PageShell title="Dashboard" description="At-a-glance business health and accounting activity.">
+    <PageShell title="Executive Dashboard" description="Enterprise-grade overview of financial operations, liquidity, and collection performance.">
       <div className="kpi-grid">
-        <article className="kpi-card"><strong>Revenue (MTD)</strong><p>$0.00</p></article>
-        <article className="kpi-card"><strong>Expenses (MTD)</strong><p>$0.00</p></article>
-        <article className="kpi-card"><strong>Cash Balance</strong><p>$0.00</p></article>
+        {kpiData.map((item) => (
+          <article className="kpi-card" key={item.label}>
+            <strong>{item.label}</strong>
+            <p>{item.value}</p>
+            <span>{item.change}</span>
+          </article>
+        ))}
       </div>
     </PageShell>
   );
