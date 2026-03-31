@@ -18,13 +18,13 @@ export class ExternalConnection {
   @Column({ type: 'enum', enum: ConnectionProvider })
   provider!: ConnectionProvider;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   externalOrgId!: string | null;
 
   @Column()
   accessToken!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   refreshToken!: string | null;
 
   @Column({ type: 'jsonb', nullable: true })

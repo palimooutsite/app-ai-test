@@ -37,7 +37,7 @@ export class Account {
   @Column({ type: 'enum', enum: AccountType })
   type!: AccountType;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   parentId!: string | null;
 
   @ManyToOne(() => Account, (account) => account.children, { nullable: true })

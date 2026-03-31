@@ -28,6 +28,6 @@ export class JournalLine {
   @Column({ type: 'decimal', precision: 18, scale: 2 })
   credit!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   memo!: string | null;
 }
