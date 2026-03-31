@@ -34,7 +34,7 @@ import {
                 database: configService.get<string>('DB_NAME')
               }),
           entities: [Account, BankTransaction, Company, ExternalConnection, JournalEntry, JournalLine, User],
-          synchronize: false
+          synchronize: true
         };
       }
     })

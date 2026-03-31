@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '5432:5432'
+      - '55432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/accounting?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@db:55432/accounting?schema=public
       JWT_SECRET: super-secret-jwt
       PORT: 3000
     ports:
