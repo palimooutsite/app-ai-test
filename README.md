@@ -1,6 +1,6 @@
 # SaaS Accounting System (Backend + Frontend Scaffold)
 
-Production-oriented backend scaffold for a multi-tenant SME accounting platform using **NestJS + Prisma + PostgreSQL**.
+Production-oriented backend scaffold for a multi-tenant SME accounting platform using **NestJS + Prisma + PostgreSQL** plus a **Next.js frontend**.
 
 ## 1) Folder structure
 
@@ -108,17 +108,61 @@ Integrations:
 Health:
 - `GET /api/v1/health`
 
-## 6) Step-by-step setup
+## 6) Run backend + frontend with Docker Compose
 
-1. Copy env values:
-   - `DATABASE_URL`
-   - `JWT_SECRET`
-2. Start Postgres and backend with Docker:
-   - `docker compose up --build`
-3. Run migrations:
-   - `cd backend && npx prisma migrate dev --name init`
-4. Seed initial company/admin user (recommended script for next phase).
-5. Authenticate via `/auth/login`, then call protected endpoints with Bearer token.
+### Prerequisites
+- Docker Engine + Docker Compose v2 (`docker compose`).
+
+### Start all services
+1. From repository root, build and run all containers:
+   - `docker compose up --build -d`
+2. Run Prisma migrations inside the backend container:
+   - `docker compose exec backend npx prisma migrate deploy`
+
+### Service URLs
+- Frontend: `http://localhost:3001`
+- Backend API: `http://localhost:3000/api/v1`
+- Postgres: `localhost:5432`
+
+### Stop services
+- `docker compose down`
+- Remove database volume too (optional reset):
+  - `docker compose down -v`
+
+## 7) Docker deployment notes (backend and frontend)
+
+### Backend container
+- Built from root `Dockerfile`.
+- Uses production NestJS build (`dist/main.js`).
+- Required env vars:
+  - `DATABASE_URL`
+  - `JWT_SECRET`
+  - `PORT`
+
+Example standalone backend run:
+```bash
+docker build -t accounting-backend -f Dockerfile .
+docker run --rm -p 3000:3000 \
+  -e DATABASE_URL='postgresql://postgres:postgres@host.docker.internal:5432/accounting?schema=public' \
+  -e JWT_SECRET='super-secret-jwt' \
+  -e PORT=3000 \
+  accounting-backend
+```
+
+### Frontend container
+- Built from `frontend/Dockerfile`.
+- Uses production Next.js start server (`npm run start`).
+- Exposes container port `3000` (mapped to host `3001` in compose).
+- Optional env var for API base URL:
+  - `NEXT_PUBLIC_API_BASE_URL` (example: `http://backend:3000/api/v1` in Docker network).
+
+Example standalone frontend run:
+```bash
+docker build -t accounting-frontend -f frontend/Dockerfile .
+docker run --rm -p 3001:3000 \
+  -e NEXT_PUBLIC_API_BASE_URL='http://localhost:3000/api/v1' \
+  accounting-frontend
+```
 
 ## Notes for production hardening
 
@@ -127,12 +171,3 @@ Health:
 - Add idempotency keys for integrations.
 - Add audit logs and immutable journal posting workflow.
 - Add reconciliation workflows and scheduled sync jobs.
-
-
-## 6b) Frontend quick start
-
-1. Install frontend dependencies:
-   - `cd frontend && npm install`
-2. Run frontend dev server:
-   - `npm run dev`
-3. Open `http://localhost:3000` (redirects to `/dashboard`).
