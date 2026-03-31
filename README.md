@@ -136,6 +136,12 @@ Health:
 - Uses production NestJS build (`dist/main.js`).
 - Required env vars:
   - `DATABASE_URL`
+  - Or use discrete DB vars instead of `DATABASE_URL`:
+    - `DB_HOST`
+    - `DB_PORT`
+    - `DB_USER`
+    - `DB_PASSWORD`
+    - `DB_NAME`
   - `JWT_SECRET`
   - `PORT`
 
@@ -148,6 +154,11 @@ docker run --rm -p 3000:3000 \
   -e PORT=3000 \
   accounting-backend
 ```
+
+Connection troubleshooting:
+- If backend runs in Docker Compose, use `db` as hostname in `DATABASE_URL`.
+- If backend runs directly on your host machine, use `localhost` as hostname in `DATABASE_URL`.
+- Credentials can stay in the URL (for example: `postgresql://postgres:postgres@localhost:5432/accounting`) or be split into `DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME`.
 
 ### Frontend container
 - Built from `frontend/Dockerfile`.
